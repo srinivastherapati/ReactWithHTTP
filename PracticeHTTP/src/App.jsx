@@ -5,6 +5,7 @@ import Modal from './components/Modal.jsx';
 import DeleteConfirmation from './components/DeleteConfirmation.jsx';
 import logoImg from './assets/logo.png';
 import AvailablePlaces from './components/AvailablePlaces.jsx';
+import ErrorPage from './components/ErrorPage.jsx';
 
 function App() {
   const selectedPlace = useRef();
@@ -21,8 +22,7 @@ function App() {
   function handleStopRemovePlace() {
     setModalIsOpen(false);
   }
-
-  function handleSelectPlace(selectedPlace) {
+  async function handleSelectPlace(selectedPlace) {
     setUserPlaces((prevPickedPlaces) => {
       if (!prevPickedPlaces) {
         prevPickedPlaces = [];
@@ -32,6 +32,27 @@ function App() {
       }
       return [selectedPlace, ...prevPickedPlaces];
     });
+    const updatedSelectedPlaces=[selectedPlace, ...userPlaces];
+    try{
+      const response = await fetch("http://localhost:3000/user-places",{
+          method:'PUT',
+          body:JSON.stringify({places:updatedSelectedPlaces}),
+          headers:{
+            'Content-Type':'application/json'
+          }
+        })
+        console.log("saving data")
+        console.log(updatedSelectedPlaces)
+        const result=await response.json();
+
+        if(!result.ok){
+          throw new Error("Error Occured while Updating");
+        }
+        
+      }
+      catch(error){
+       // return <ErrorPage title="An erroe occured" message={error.message} />
+      }
   }
 
   const handleRemovePlace = useCallback(async function handleRemovePlace() {
