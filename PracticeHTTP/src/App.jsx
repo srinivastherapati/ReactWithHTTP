@@ -13,6 +13,7 @@ function App() {
   const [userPlaces, setUserPlaces] = useState([]);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [errorUpdate,setErrorUpdate]=useState();
 
   function handleStartRemovePlace(place) {
     setModalIsOpen(true);
@@ -41,8 +42,7 @@ function App() {
             'Content-Type':'application/json'
           }
         })
-        console.log("saving data")
-        console.log(updatedSelectedPlaces)
+       
         const result=await response.json();
 
         if(!result.ok){
@@ -52,6 +52,8 @@ function App() {
       }
       catch(error){
        // return <ErrorPage title="An erroe occured" message={error.message} />
+       setUserPlaces(userPlaces);
+       setErrorUpdate({message: "Failed to upfate"});
       }
   }
 
@@ -63,6 +65,13 @@ function App() {
     setModalIsOpen(false);
   }, []);
 
+  function handleUpdateError(){
+    setErrorUpdate(null);
+  }
+
+  if(errorUpdate){
+    return <ErrorPage title="An Error Occurend" message={errorUpdate.message} onConfirm={handleUpdateError}/>
+  }
   return (
     <>
       <Modal open={modalIsOpen} onClose={handleStopRemovePlace}>
